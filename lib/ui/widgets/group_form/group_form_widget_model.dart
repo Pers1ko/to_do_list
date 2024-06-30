@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_list/domain/data_provider/box_manager.dart';
 import 'package:to_do_list/entity/group.dart';
+import 'package:to_do_list/entity/task.dart';
 
 class GroupFormWidgetModel extends ChangeNotifier {
   var _groupName = '';
+  var _taskText = '';
   String? errorText;
 
   set groupName (String value) {
@@ -14,20 +16,36 @@ class GroupFormWidgetModel extends ChangeNotifier {
     _groupName = value;
   }
 
-  void saveGroup(BuildContext context ) async {
+   set taskText(String value) { 
+    _taskText = value;
+  }
+
+  Future<void> saveGroupAndTasks(BuildContext context) async { // Изменено: новый метод для сохранения группы и задач
     final groupName = _groupName.trim();
+    final taskText = _taskText.trim();
+
     if (groupName.isEmpty) {
       errorText = 'Введите название группы';
       notifyListeners();
       return;
     }
-    final box = await BoxManager.instance.openGroupBox();
+
+    final groupBox = await BoxManager.instance.openGroupBox();
     final group = Group(name: groupName);
-    await box.add(group);
-    await BoxManager.instance.closeBox(box);
+    final groupKey = await groupBox.add(group);
+
+    if (taskText.isNotEmpty) {
+      final taskBox = await BoxManager.instance.openTaskBox(groupKey);
+      final task = Task(text: taskText, isDone: false);
+      await taskBox.add(task);
+      await BoxManager.instance.closeBox(taskBox);
+    }
+
+    await BoxManager.instance.closeBox(groupBox);
     Navigator.of(context).pop();
   }
 }
+
 
 class GroupFormWidgetModelProvider extends InheritedNotifier {
   final GroupFormWidgetModel model;

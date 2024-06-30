@@ -33,17 +33,22 @@ class _GroupWidgetBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
         
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
 
-        title: const Text('Группы',
-        style: TextStyle(color: Colors.white),)
+        title: const Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Text('Заметки',
+          style: TextStyle(color: Colors.black,
+                            fontSize: 29,
+                            fontWeight: FontWeight.bold,
+                            ),),
+        )
         ,
         ),
         body: const _GroupListWidget(),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.black,
           onPressed: () => GroupsWidgetModelProvider.read(context)?.model.showForm(context),
           child: const Icon(Icons.add,
           color: Colors.white,)),
@@ -57,11 +62,8 @@ class _GroupListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groupsCount = GroupsWidgetModelProvider.watch(context)?.model.groups.length ?? 0;
-    return ListView.separated(
+    return ListView.builder(
       itemCount: groupsCount,
-      separatorBuilder: (BuildContext context, int index) {
-        return const Divider(height: 1,);
-      },
       itemBuilder: (BuildContext context, int index) {
         return _GroupListRowWidget(indexInList: index);
       }
@@ -81,24 +83,30 @@ class _GroupListRowWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = GroupsWidgetModelProvider.read(context)!.model;
     final group = model.groups[indexInList];
-    return Slidable(
-    endActionPane: ActionPane(
-    motion: const StretchMotion(),
-    children: [
-      SlidableAction(
-        onPressed: (context) => model.deleteGroup(indexInList),
-        backgroundColor: const Color(0xFFFE4A49),
-        foregroundColor: Colors.white,
-        icon: Icons.delete,
-        label: 'Delete',
-        
-      ),
-    ],
-  ),
-      child: ListTile(
-        title: Text(group.name),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => model.showTasks(context, indexInList),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Slidable(
+      endActionPane: ActionPane(
+      motion: const StretchMotion(),
+      children: [
+        SlidableAction(
+          onPressed: (context) => model.deleteGroup(indexInList),
+          backgroundColor: const Color(0xFFFE4A49),
+          foregroundColor: Colors.white,
+          icon: Icons.delete,
+          label: 'Delete',
+          
+        ),
+      ],
+        ),
+        child: ListTile(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30),
+          side: const BorderSide(color: Colors.black,
+          width: 2)),
+          title: Text(group.name),
+          trailing: const Icon(Icons.chevron_right, color: Colors.black,),
+          onTap: () => model.showTasks(context, indexInList),
+        ),
       ),
     );
   }
